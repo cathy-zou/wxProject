@@ -1,0 +1,128 @@
+<style lang="less">
+  .page{
+    width: 100%;
+  }
+  page,
+  .page,
+  .page__bd{
+    height: 100%;
+  }
+  .page__bd{
+    padding-bottom: 0;
+  }
+  .weui-tab__content{
+    height: 100%;
+    position: relative;
+    text-align: center;
+  }
+</style>
+<template>
+  <view class="container">
+    <view class="page">
+      <view class="page__bd">
+        <view class="weui-tab">
+          <view class="weui-navbar" style="position: fixed;background-color: #fff;">
+            <block wx:for="{{tabs}}" wx:key="*this">
+              <view id="{{index}}" class="weui-navbar__item {{activeIndex == index ? 'weui-bar__item_on' : ''}}" bindtap="tabClick">
+                <view class="weui-navbar__title">{{item}}</view>
+              </view>
+            </block>
+            <view class="weui-navbar__slider" style="left: {{sliderLeft}}px; transform: translateX({{sliderOffset}}px); -webkit-transform: translateX({{sliderOffset}}px);"></view>
+          </view>
+          <view class="weui-tab__panel" style="padding-bottom: 120rpx;">
+            <view class="weui-tab__content" hidden="{{activeIndex != 0}}">
+              <product></product>
+            </view>
+            <view class="weui-tab__content" hidden="{{activeIndex != 1}}">
+              <comment></comment>
+            </view>
+            <view class="weui-tab__content" hidden="{{activeIndex != 2}}">
+              <shop></shop>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import product from './Components/index/product'
+  import comment from './Components/index/comment'
+  import shop from './Components/index/shop'
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: 'test'
+    }
+    components = {
+      product: product,
+      comment: comment,
+      shop: shop
+    }
+
+    data = {
+      tabs: ['点餐', '评价', '商家'],
+      activeIndex: 0,
+      sliderOffset: 0,
+      sliderLeft: 0
+    }
+
+    computed = {
+    }
+
+    methods = {
+      tap () {
+      },
+      communicate () {
+      },
+      request () {
+        let self = this
+        let i = 10
+        let map = ['MA==', 'MQo=', 'Mg==', 'Mw==', 'NA==', 'NQ==', 'Ng==', 'Nw==', 'OA==', 'OQ==']
+        while (i--) {
+          wepy.request({
+            url: 'https://www.madcoder.cn/tests/sleep.php?time=1&t=css&c=' + map[i] + '&i=' + i,
+            success: function (d) {
+              self.netrst += d.data + '.'
+              self.$apply()
+            }
+          })
+        }
+      },
+      counterEmit (...args) {
+      }
+    }
+
+    events = {
+      'index-emit': (...args) => {
+        let $event = args[args.length - 1]
+        console.log(`${this.$name} receive ${$event.name} from ${$event.source.$name}`)
+      }
+    }
+
+    onLoad () {
+      var that = this
+      var sliderWidth = 96
+      wx.getSystemInfo({
+        success: function(res) {
+          that.setData({
+            sliderLeft: (res.windowWidth / that.data.tabs.length - sliderWidth) / 2,
+            sliderOffset: res.windowWidth / that.data.tabs.length * that.data.activeIndex
+          })
+        }
+      })
+    }
+    tabClick (e) {
+      console.log(e)
+      console.log(this)
+      // this.setData({
+      //   sliderOffset: e.currentTarget.offsetLeft,
+      //   activeIndex: e.currentTarget.id
+      // })
+      this.sliderOffset = e.currentTarget.offsetLeft
+      this.activeIndex = e.currentTarget.id
+    }
+  }
+</script>

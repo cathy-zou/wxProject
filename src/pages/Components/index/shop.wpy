@@ -1,0 +1,96 @@
+<style lang="less">
+  .shop-container{
+    color: #333;
+    text-align: left;
+    background-color: #f6f6f6;
+    padding: 20rpx 40rpx;
+    .th-container{
+      background-color: #fff;
+      padding: 20rpx;
+      font-size: 12px;
+      margin-bottom: 20rpx;
+      border-radius: 5rpx;
+      .th-title{
+        color: #000;
+        font-size: 16px;
+      }
+      .tag-container{
+        overflow: hidden;
+        margin-bottom: 10rpx;
+        .tag{
+          float: left;
+          background-color: rgba(255,84,107, 0.5);
+          padding: 5rpx 15rpx;
+          color: #fff;
+          border: 1px solid rgba(255,84,107,0.6);
+          border-radius: 5rpx;
+          margin-right: 10rpx;
+        }
+        .content{
+          float: left;
+          padding: 5rpx 0;
+          font-size: 12px;
+          color: #333;
+        }
+      }
+      .introduct{
+        color: #333;
+        padding: 20rpx 0;
+      }
+    }
+  }
+</style>
+
+<template>
+  <view class="shop-container">
+    <view class="th-container">
+      <view class="th-title">配送信息</view>
+      <view class="th-content">由商家配送提供配送，约36分钟送达，距离82m</view>
+      <view class="th-discription">配送费 ¥ 5元</view>
+    </view>
+    <view class="th-container">
+      <view class="th-title">活动与服务</view>
+      <repeat for="{{activity}}" key="index" index="index" item="item">
+        <view class="tag-container">
+          <view class="tag">{{item.type}}</view>
+          <view class="content">{{item.content}}</view>
+        </view>
+      </repeat>
+    </view>
+    <view class="th-container">
+      <view class="th-title">商家信息</view>
+      <view class="introduct">暂无简介</view>
+      <panel :listData="listData"></panel>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import panel from '../../../components/panel'
+
+  export default class shop extends wepy.component {
+    data = {
+      activity: [
+        {type: '首单', content: '新用户下单立减17元(不与其他活动同享)'},
+        {type: '满减', content: '满80减40'},
+        {type: '特价', content: '特价5元'},
+        {type: '特价', content: '特价10元'},
+        {type: '特价', content: '特价15元'}
+      ],
+      listData: [
+        {title: '品类', content: '咖啡,奶茶,果汁'},
+        {title: '商家电话', content: '020-85694696'},
+        {title: '地址', content: '广州市天河区花城大道XX号'},
+        {title: '营业时间', content: '10:00-21:45'}
+      ]
+    }
+    components = {
+      panel: panel
+    }
+    onLoad () {
+    }
+    methods = {
+    }
+  }
+</script>

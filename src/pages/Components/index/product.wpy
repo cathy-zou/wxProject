@@ -1,0 +1,334 @@
+<style lang="less">
+  @navWidth: 160rpx;
+  .product{
+    height: 100%;
+    position: relative;
+  }
+  .nav-bar{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: @navWidth;
+    height: 100%;
+    font-size: 14px;
+    border-right: 1px solid #f6f6f6;
+    padding-bottom: 120rpx;
+    .nav-item{
+      height: 80rpx;
+      line-height: 80rpx;
+      background-color: #fff;
+      width: 100%;
+    }
+    .active{
+      color: #1aad19;
+      background-color: #f6f6f6;
+    }
+  }
+  .main{
+    text-align: left;
+    height: 100%;
+    padding-left: @navWidth;
+    box-sizing:border-box;
+    .product-list{
+      width: 100%;
+      padding-bottom: 120rpx;
+      .weui-cell{
+        /*border-bottom: 1px solid #f6f6f6;*/
+        padding: 10px 0;
+      }
+    }
+    .counterview{
+      margin-top: 20rpx;
+      float: right;
+      height: 60rpx;
+      line-height: 60rpx;
+      .counter-num{
+        float: left;
+        height:60rpx;
+        line-height:60rpx;
+      }
+      .couter-btn{
+        float: left;
+        padding: 0 10px;
+        height:60rpx;
+        line-height:60rpx;
+        margin:0 10px;
+      }
+    }
+  }
+  .purchase-bar{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 90;
+    width: 100%;
+    height: 120rpx;
+    background-color: #fff;
+    border-top: 1px solid #f6f6f6;
+    .price-bar{
+      padding-top: 30rpx;
+      width: 200rpx;
+      font-size: 15px;
+      float: left;
+      .price{
+        font-size: 20px;
+        margin-left:10rpx;
+        color: #ED774B;
+      }
+    }
+    .purchase-btn{
+      float:right;
+      font-size:14px;
+      border:none;
+      width:200rpx;
+      background-color:#FED837;
+      color:#333;
+      height:120rpx;
+      line-height:120rpx;
+      border-radius:0;
+      box-sizing:content-box;
+    }
+  }
+  .checked-list-container{
+    position: fixed;
+    width: 100%;
+    left: 0;
+    bottom: 122rpx;
+    padding: 0 20rpx;
+    box-sizing: border-box;
+    background-color: #f6f6f6;
+    .fl{
+      float: left;
+    }
+    .fr{
+      float: right;
+    }
+    .checked-list-header{
+      padding: 12px;
+      color: #333;
+      height: 30rpx;
+      line-height: 30rpx;
+      .empty{
+        color: #ccc;
+        display: inline;
+      }
+    }
+    .checked-list-body{
+      border-top: 1px dashed #ccc;
+      font-size: 11px;
+      color: #333;
+      background-color: #fff;
+     .checked-item-container{
+       overflow: hidden;
+       padding: 10rpx 0;
+       .price{
+         color: #f40;
+         font-size: 13px;
+       }
+       .counter{
+         .btn{
+           color: #333;
+           border-radius:50%;
+           width:50rpx;
+           height:50rpx;
+           display:inline-block;
+           line-height:50rpx;
+           font-size:15px;
+           margin:0 10rpx;
+         }
+         .add-btn{
+           background-color: #FED837;
+         }
+         .reduce-btn{
+           background-color: #f6f6f6;
+         }
+       }
+     }
+    }
+  }
+</style>
+
+<template>
+ <view class="product">
+   <scroll-view scroll-y class="nav-bar">
+     <repeat for="{{navList}}" key="index" index="index" item="item">
+       <view @tap="tap({{index}})" class="nav-item {{activeIndex == index ? 'active' : ''}}">{{item}}</view>
+     </repeat>
+   </scroll-view>
+   <scroll-view scroll-y scroll-top='{{ scrollTop }}' class="main" bindscroll="handleScroll">
+     <view class="product-list">
+       <repeat for="{{list}}" item="items" index="index" key="index">
+         <view class="title" style="padding: 10rpx 32rpx;color: #333;font-size: 14px;border-bottom: 2px solid #1aad19;">{{items.name}}</view>
+         <repeat for="{{items.foods}}" item="item" index="i" key="i">
+           <view  class="weui-cell">
+             <view class="weui-cell__hd" style="position: relative;margin-right: 10px;">
+               <image src="{{item.image_url}}" style="width: 50px; height: 50px; display: block"/>
+             </view>
+             <view class="weui-cell__bd">
+               <view @tap="goToDetails({{item.item_id}})" style="overflow: hidden;text-overflow:ellipsis;white-space: nowrap;font-size: 14px;">{{item.name}}</view>
+               <view @tap="goToDetails({{item.item_id}})" style="font-size: 12px;color: #888888;display: -webkit-box;-webkit-box-orient: vertical;-webkit-line-clamp: 3;overflow: hidden;">{{item.description}}</view>
+               <view style="padding-top: 18rpx;font-size: 12px;float: left;width: 20rpx;color: #ED774B;">¥<text style="font-size: 16px;margin-left:10rpx;">{{item.specfoods[0].price}}</text></view>
+               <view class="counterview">
+                 <button class="couter-btn" @tap.stop="reduce({{index}}, {{i}})">-</button>
+                 <view class="counter-num">{{item.num}}</view>
+                 <button class="couter-btn" @tap.stop="add({{index}}, {{i}})">+</button>
+               </view>
+             </view>
+           </view>
+         </repeat>
+       </repeat>
+     </view>
+   </scroll-view>
+ </view>
+  <view class="checked-list-container" wx-if="{{cartVisible}}">
+    <view class="checked-list-header"><text class="fl">已选列表</text> <view class="fr empty" @tap="handleEmpty">清空</view></view>
+    <view class="checked-list-body">
+      <repeat for="{{checkList}}">
+        <view class="checked-item-container">
+          <text class="fl">{{item.name}}</text> <text class="fl price">￥{{item.specfoods[0].price}}</text>
+          <view class="fr counter">
+            <view @tap="reduce({{item.index}}, {{item.i}})" class="btn reduce-btn">-</view>
+            <text>{{item.num}}</text>
+            <view @tap="add({{item.index}}, {{item.i}})" class="btn add-btn">+</view>
+          </view>
+        </view>
+      </repeat>
+    </view>
+  </view>
+ <view class="purchase-bar">
+   <view class="price-bar" @tap="showCart">¥<text class="price">{{totalPrice}}</text></view>
+   <button class="purchase-btn" @tap="toOrder" disabled="{{btnDisabled}}">购买</button>
+ </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  export default class product extends wepy.component {
+    data = {
+      navList: [],
+      list: [],
+      activeIndex: 0,
+      totalPrice: 0,
+      height: [],
+      checkList: [],
+      scrollTop: 0,
+      btnDisabled: true,
+      cartVisible: false
+    }
+    components = {
+    }
+    watch = {
+      list (val) {
+        let length = val.map((item, index) => {
+          return item.foods.length
+        })
+        let totalHeight = 0
+        this.height = length.map((item, index) => {
+          totalHeight += item * 139
+          return totalHeight - 200
+        })
+        this.height.unshift(0)
+      },
+      checkList (val) {
+        if (!val.length) {
+          this.cartVisible = false
+        } else {
+          this.btnDisabled = false
+        }
+      }
+    }
+    onLoad () {
+      this.getData()
+    }
+    methods = {
+      add (index, i) {
+        this.list[index].foods[i].num++
+        this.handleTotalPrice()
+      },
+      reduce (index, i) {
+        if (this.list[index].foods[i].num > 0) {
+          this.list[index].foods[i].num--
+          this.handleTotalPrice()
+        }
+      },
+      handleEmpty () {
+        this.checkList = []
+        this.list.forEach(item => {
+          item.foods.forEach(i => {
+            i.num = 0
+          })
+        })
+      },
+      tap (index) {
+        this.activeIndex = index
+        this.scrollTop = this.height[this.activeIndex]
+      },
+      goToDetails (id) {
+        wx.navigateTo({
+          url: 'details?id=' + id
+        })
+      },
+      toOrder () {
+        let _this = this
+        wx.setStorageSync('orderList', _this.checkList)
+        wx.navigateTo({
+          url: 'order'
+        })
+      },
+      showCart () {
+        if (!this.checkList.length) {
+          this.cartVisible = false
+        } else {
+          this.cartVisible = !this.cartVisible
+        }
+      },
+      handleScroll (e) {
+        let _this = this
+        _this.height.forEach((item, index) => {
+          if (e.detail.scrollTop >= item) {
+            _this.activeIndex = index
+          }
+        })
+      }
+    }
+    handleCheckedGoods () {
+      let _this = this
+      _this.checkList = []
+      _this.list.forEach((item, index) => {
+        item.foods.forEach((v, i) => {
+          if (v.num > 0) {
+            v.i = i
+            v.index = index
+            _this.checkList.push(v)
+          }
+        })
+      })
+      return _this.checkList
+    }
+    handleTotalPrice () {
+      this.totalPrice = 0
+      this.handleCheckedGoods().forEach(item => {
+        this.totalPrice += item.num * item.specfoods[0].price
+      })
+    }
+    getData () {
+      let _this = this
+      wx.request({
+        url: 'https://easy-mock.com/mock/59abab95e0dc66334199cc5f/coco/aa',
+        methods: 'get',
+        data: {},
+        success: function(res) {
+          _this.list = res.data
+          _this.navList = _this.list.map((item, index) => {
+            item.foods.forEach(i => {
+              i.num = 0
+            })
+            return item.name
+          })
+          _this.$apply()
+        }
+      })
+    }
+  }
+</script>

@@ -1,0 +1,171 @@
+<style lang="less">
+.weixin-container{
+  background-color: #f6f6f6;
+  color: #333;
+  padding: 20rpx 40rpx;
+  text-align: left;
+  font-size: 12px;
+  .score-container{
+    overflow: hidden;
+    background-color: #fff;
+    padding: 20rpx;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20rpx;
+    .left-container{
+      text-align: center;
+      float: left;
+      border-right: 1px dashed #ccc;
+      padding-right: 20rpx;
+      .score{
+        color: #f40;
+        font-size: 16px;
+      }
+    }
+    .right-container{
+      float: left;
+      width: 300rpx;
+    }
+  }
+  .tags-container{
+    padding: 20rpx 40rpx 10rpx 40rpx;
+    color: #fff;
+    overflow: hidden;
+    background-color: #fff;
+    margin-bottom: 20rpx;
+    .tag{
+      float: left;
+      margin-right: 10rpx;
+      margin-bottom: 10rpx;
+      background-color: lightskyblue;
+      border-radius: 5rpx;
+      padding: 5rpx 15rpx;
+    }
+    .tag.active{
+      background-color: deepskyblue;
+    }
+  }
+  .comment-container{
+    .comment-item-container{
+      background-color: #fff;
+      padding: 20rpx 40rpx;
+      margin-bottom: 20rpx;
+      .comment-item-header{
+        display: flex;
+        justify-content: space-between;
+        .comment-header-left{
+          overflow: hidden;
+          image{
+            float: left;
+            width: 100rpx;
+            height: 100rpx;
+            border-radius: 50%;
+          }
+          .left-content{
+            margin-left: 10rpx;
+            float: left;
+            .rate{
+              color: #f40;
+              font-size: 14px;
+            }
+          }
+        }
+        .comment-header-right{
+          .time{
+            color: #ccc;
+          }
+        }
+      }
+      .comment-item-body{
+        padding: 20rpx 20rpx 20rpx 100rpx;
+        overflow: hidden;
+        image{
+          width: 240rpx;
+          height: 240rpx;
+          border: 1px solid #f6f6f6;
+          float: left;
+        }
+      }
+    }
+  }
+}
+</style>
+
+<template>
+  <view class="weixin-container">
+    <view class="score-container">
+      <view class="left-container">
+        <view class="score">5.0</view>
+        <view>综合评价</view>
+        <view>高于周边商家73.4%</view>
+      </view>
+      <view class="right-container">
+        <panel :listData="listData"></panel>
+      </view>
+    </view>
+    <view class="tags-container">
+      <view class="tag active">全部10</view>
+      <view class="tag">满意6</view>
+      <view class="tag">不满意4</view>
+      <view class="tag">有图5</view>
+      <view class="tag">味道好8</view>
+      <view class="tag">快递快2</view>
+    </view>
+    <view class="comment-container">
+      <repeat for="{{commentList}}">
+        <view class="comment-item-container">
+          <view class="comment-item-header">
+            <view class="comment-header-left">
+              <image src="../../images/1.jpg" alt=""/>
+              <view class="left-content">
+                <view class="name">{{item.name}}</view>
+                <view class="rate">{{item.rate}}</view>
+              </view>
+            </view>
+            <view class="comment-header-right">
+              <view class="time">{{item.createTime}}</view>
+            </view>
+          </view>
+          <view class="comment-item-body">
+            <view class="content">{{item.content}}</view>
+            <image wx-if="{{item.src}}" src="{{item.src}}" alt=""/>
+          </view>
+        </view>
+      </repeat>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import panel from '../../../components/panel'
+
+  export default class comment extends wepy.component {
+    data = {
+      listData: [
+        {title: '服务态度', content: '5.0'},
+        {title: '菜品评价', content: '4.6'},
+        {title: '送达时间', content: '40分钟'}
+      ],
+      commentList: [
+        {name: '2******f', rate: '超赞', createTime: '2018-06-14', content: '', src: 'https://fuss10.elemecdn.com/c/f1/e7d3a34bef76ea0a52107241d6edcjpeg.jpeg?imageMogr/format/webp/thumbnail/!140x140r/gravity/Center/crop/140x140/'},
+        {name: '3******w', rate: '赞', createTime: '2018-06-10', content: '', src: 'https://fuss10.elemecdn.com/d/c2/3c4586c80b9734ac488462e30d3eejpeg.jpeg?imageMogr/format/webp/thumbnail/!140x140r/gravity/Center/crop/140x140/'},
+        {name: '7******2', rate: '一般', createTime: '2018-05-31', content: '还行', src: 'https://fuss10.elemecdn.com/c/8e/04076f034f16c110c9b242e0f0fc3jpeg.jpeg?imageMogr/format/webp/thumbnail/!140x140r/gravity/Center/crop/140x140/'},
+        {name: 'w******1', rate: '超赞', createTime: '2018-05-22', content: '超级好喝，强烈推荐！！', src: 'https://fuss10.elemecdn.com/c/8e/04076f034f16c110c9b242e0f0fc3jpeg.jpeg?imageMogr/format/webp/thumbnail/!140x140r/gravity/Center/crop/140x140/'},
+        {name: 'd******2', rate: '还行', createTime: '2018-05-19', content: '味道一般般', src: 'https://fuss10.elemecdn.com/8/26/2760aa963a181bb4afccda0831ce4jpeg.jpeg?imageMogr/format/webp/thumbnail/!140x140r/gravity/Center/crop/140x140/'},
+        {name: '2******a', rate: '赞', createTime: '2018-05-18', content: '超级赞', src: ''},
+        {name: '6******f', rate: '超赞', createTime: '2018-05-18', content: '', src: 'https://fuss10.elemecdn.com/b/8f/73c28247fa6c7036a39f577d2c444jpeg.jpeg?imageMogr/format/webp/thumbnail/!140x140r/gravity/Center/crop/140x140/'},
+        {name: 'g******v', rate: '赞', createTime: '2018-05-17', content: '快递很棒', src: ''},
+        {name: 'k******b', rate: '赞', createTime: '2018-05-10', content: '强推', src: ''},
+        {name: 'c******o', rate: '差', createTime: '2018-05-10', content: '快递小哥送来都洒了，差评！！', src: ''}
+      ]
+    }
+    components = {
+      panel: panel
+    }
+    onLoad () {
+    }
+    methods = {
+    }
+  }
+</script>

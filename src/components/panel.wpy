@@ -1,0 +1,47 @@
+<style lang="less">
+  .panel{
+    .column{
+      display: flex;
+      justify-content: space-between;
+      color: #bbb;
+      .title{
+        font-size: 13px;
+        font-weight: bold;
+      }
+      .content{
+        font-style: 12px;
+      }
+    }
+  }
+</style>
+<template>
+  <view class="panel">
+    <repeat for="{{listData}}" key="index" index="index" item="item">
+      <view class="column"><text class="title">{{item.title}}</text><text class="content">{{item.content}}</text></view>
+    </repeat>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+
+  export default class panel extends wepy.component {
+    data = {}
+    props = {
+      listData: {
+        type: Array,
+        default: []
+      }
+    }
+    onload () {
+      console.log('111', this.listData)
+    }
+    watch = {
+      listData (val) {
+        console.log(val)
+        if (val) {
+          this.$apply()
+        }
+      }
+    }
+  }
+</script>

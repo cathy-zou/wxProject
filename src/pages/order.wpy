@@ -1,0 +1,243 @@
+<style lang="less">
+  .order-container{
+    background-color: #f6f6f6;
+    padding: 20rpx;
+    box-sizing:border-box;
+    padding-bottom: 52px;
+    .list-container{
+      background-color: #fff;
+      font-size: 14px;
+      color: #333;
+      border-radius: 5rpx;
+      margin-bottom: 20rpx;
+      .list-header{
+        font-size: 16px;
+        border-bottom: 1px dashed #f6f6f6;
+        padding-left: 20rpx;
+        .fr{
+          float: right;
+          color: #ccc;
+          padding-right: 20rpx;
+        }
+      }
+      .list-body {
+        padding: 20rpx;
+        input{
+          padding-left: 15rpx;
+        }
+        .address-item{
+          display: flex;
+          justify-content: space-between;
+          .title{
+            font-size: 13px;
+          }
+          .content{
+            font-size: 12px;
+          }
+        }
+      }
+      .list-item-container{
+        padding: 20rpx;
+        display: flex;
+        justify-content: space-between;
+      }
+      .total-price{
+        font-size: 16px;
+        color: #f40;
+      }
+      .add-details{
+        width: 100%;
+        height: 100rpx;
+        line-height: 100rpx;
+        text-align: center;
+      }
+    }
+    .purchase-bar{
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      z-index: 90;
+      width: 100%;
+      height: 120rpx;
+      background-color: #fff;
+      border-top: 1px solid #f6f6f6;
+      .price-bar{
+        padding-top: 30rpx;
+        padding-left: 20rpx;
+        width: 200rpx;
+        font-size: 15px;
+        float: left;
+        .price{
+          font-size: 20px;
+          margin-left:10rpx;
+          color: #ED774B;
+        }
+      }
+      .purchase-btn{
+        float:right;
+        font-size:14px;
+        border:none;
+        width:200rpx;
+        background-color:#FED837;
+        color:#333;
+        height:120rpx;
+        line-height:120rpx;
+        border-radius:0;
+        box-sizing:content-box;
+      }
+    }
+  }
+</style>
+
+<template>
+  <scroll-view class="order-container">
+    <view class="list-container">
+      <view class="list-header">收货信息 <text class="fr" @tap="addDetails">修改</text></view>
+      <view class="list-body">
+        <view wx-if="{{addressShow}}">
+          <repeat item="item" index="index" key="index" for="{{addressData}}">
+            <view class="address-item">
+              <text class="title">{{item.title}}</text>
+              <text class="content">{{item.content}}</text>
+            </view>
+          </repeat>
+        </view>
+        <view wx-if="{{!addressShow}}" class="add-details" @tap="addDetails">+ <text>新增收货信息</text></view>
+      </view>
+    </view>
+    <view class="list-container">
+        <view class="list-header">
+          订单详情
+        </view>
+        <view class="list-body">
+          <repeat for="{{orderList}}" index="index" item="item" key="index">
+            <view class="list-item-container">
+              <view>{{item.name}}</view>
+              <view>×{{item.num}}</view>
+              <view>{{item.specfoods[0].price * item.num}}元</view>
+            </view>
+          </repeat>
+        </view>
+        <view class="list-footer">
+          <repeat for="{{other}}" key="index" index="index" item="item">
+            <view class="list-item-container">
+              <view>{{item.name}}</view>
+              <view>{{item.price}}元</view>
+            </view>
+          </repeat>
+          <view class="list-item-container">
+            <view>订单总额：</view>
+            <view>小计: ¥<text class="total-price">{{totalPrice}}</text>元</view>
+          </view>
+        </view>
+    </view>
+    <view class="list-container">
+      <view class="weui-cells__title"></view>
+      <view class="weui-cells weui-cells_after-title">
+        <view class="weui-cell weui-cell_select">
+          <view class="weui-cell__hd weui-cell__hd_in-select-after">
+            <view class="weui-label">送达时间</view>
+          </view>
+          <view class="weui-cell__bd">
+            <picker bindchange="bindGetGoodsChange" value="{{getGoodsIndex}}" range="{{getGoods}}">
+              <view class="weui-select weui-select_in-select-after">{{getGoods[getGoodsIndex]}}</view>
+            </picker>
+          </view>
+        </view>
+        <view class="weui-cell weui-cell_select">
+          <view class="weui-cell__hd weui-cell__hd_in-select-after">
+            <view class="weui-label">支付方式</view>
+          </view>
+          <view class="weui-cell__bd">
+            <picker bindchange="bindPayTypeChange" value="{{payTypeIndex}}" range="{{payType}}">
+              <view class="weui-select weui-select_in-select-after">{{payType[payTypeIndex]}}</view>
+            </picker>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="list-container">
+      <view class="list-header">
+        其他
+      </view>
+      <view class="list-body">
+        <input type="text" bindinput="bindDescription" placeholder="备注"/>
+      </view>
+    </view>
+    <view class="purchase-bar">
+      <view class="price-bar">¥<text class="price">{{totalPrice}}</text></view>
+      <button class="purchase-btn" @tap="toPay">去支付</button>
+    </view>
+  </scroll-view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  export default class details extends wepy.page {
+    data = {
+      orderList: [],
+      addressData: [],
+      other: [
+        {name: '新用户立减3元', price: -3},
+        {name: '配送费', price: 4},
+        {name: '餐盒费', price: 2}
+      ],
+      totalPrice: 0,
+      payType: ['银行卡', '微信', '支付宝'],
+      payTypeIndex: 0,
+      getGoods: ['立刻送货', '10:00', '11:00'],
+      getGoodsIndex: 0,
+      description: '',
+      addressShow: false
+    }
+    watch = {
+      addressData (val) {
+        this.addressShow = !!val.length
+        this.$apply()
+      }
+    }
+    computed = {
+      totalPrice () {
+        let totalPrice = 0
+        this.orderList.forEach(item => {
+          totalPrice += item.specfoods[0].price * item.num
+        })
+        this.other.forEach(item => {
+          totalPrice += item.price
+        })
+        return totalPrice
+      }
+    }
+    components = {
+    }
+    onLoad (option) {
+      this.orderList = wx.getStorageSync('orderList')
+      this.addressData = wx.getStorageSync('address')
+      this.$apply()
+    }
+    methods = {
+      bindPayTypeChange: function(e) {
+        this.payTypeIndex = e.detail.value
+      },
+      bindGetGoodsChange: function(e) {
+        this.getGoodsIndex = e.detail.value
+      },
+      toPay () {
+        console.log('支付')
+        console.log(this.payTypeIndex)
+        console.log(this.getGoodsIndex)
+        console.log(this.description)
+        console.log(this.orderList)
+      },
+      addDetails () {
+        wx.navigateTo({
+          url: 'addressForm'
+        })
+      },
+      bindDescription (e) {
+        this.description = e.detail.value
+      }
+    }
+  }
+</script>

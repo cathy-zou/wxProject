@@ -1,0 +1,64 @@
+<style lang="less">
+
+</style>
+
+<template>
+  <view class="page">
+    <view class="page__bd">
+      <view class="weui-article">
+        <view class="weui-article__h1">{{singleData.name}}</view>
+        <view class="weui-article__section">
+          <view class="weui-article__section">
+            <view class="weui-article__p">
+              {{singleData.description}}
+            </view>
+            <view class="weui-article__p">
+              <image class="weui-article__img" src="{{singleData.image_url}}" mode="aspectFit" style="height: 180px" />
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  export default class details extends wepy.page {
+    data = {
+      productList: [],
+      singleData: {}
+    }
+    components = {
+    }
+    onLoad (option) {
+      console.log(option)
+      this.getData(option.id)
+    }
+    methods = {
+    }
+    getData (id, activeIndex) {
+      let _this = this
+      wx.request({
+        url: 'https://easy-mock.com/mock/59abab95e0dc66334199cc5f/coco/aa',
+        methods: 'get',
+        data: {},
+        success: function(res) {
+          let data = res.data
+          data.forEach((item, index) => {
+            item.foods.forEach(i => {
+              _this.productList.push(i)
+            })
+          })
+          _this.productList.forEach(item => {
+            if (item.item_id + '' === id + '') {
+              _this.singleData = item
+            }
+          })
+          _this.$apply()
+        }
+      })
+    }
+  }
+</script>
